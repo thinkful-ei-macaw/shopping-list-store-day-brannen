@@ -13,7 +13,9 @@ const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
   if (!item.checked) {
     itemTitle = `
-     <span class='shopping-item'>${item.name}</span>
+    <form class="js-edit-item">
+     <input class='shopping-item' type='text' value="${item.name}" />
+    </form>
     `;
   }
 
@@ -26,9 +28,6 @@ const generateItemElement = function (item) {
         </button>
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
-        </button>
-        <button class='shopping-item-edit js-item-edit'>
-          <span class='button-label'>Edit</span>
         </button>
       </div>
     </li>`;
@@ -107,30 +106,20 @@ const getItemIdFromElement = function (item) {
  * @param {string} id 
  */
 const handleItemEditedClicked = function () {
-  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+  $('.js-shopping-list').on('submit', '.js-item-edit', event => {
+    event.preventDefault();
     const id = getItemIdFromElement(event.currentTarget);
-    toggleEditedProperty(id);
-    $('#user_input').toggleClass();
+    const itemName = $(event.currentTarget).find('.shopping-item').val();
+    editListItemName(id, itemName);
+    render();
   })
 }
 
-const listenForSubmit = function () {
-  $('.js-shopping-list').submit(event => {
-    store.items.name = updatedName();
-  })
+const editListItemName = function (id, itemName) {
+  const item = store.items.find(item.id === id);
+  item.name = itemName;
 }
 
-const toggleEditedProperty = function (id) {
-  const foundItem = store.items.find(item => item.id === id);
-  foundItem.edited = !foundItem.edited;
-};
-
-const editItemTitle = function (id) {
-  const index = store.items.find(item => item.id === id);
-  store.items.splice(index, 1, updatedTitle);
-}
-
-const updatedName = function() {};
 
 
 const deleteListItem = function (id) {
@@ -193,6 +182,7 @@ const handleShoppingList = function () {
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
+  handleItemEditedClicked();
   handleToggleFilterClick();
 };
 
