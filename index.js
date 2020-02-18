@@ -1,10 +1,10 @@
 'use strict';
 const store = {
   items: [
-    { id: cuid(), name: 'apples', checked: false },
-    { id: cuid(), name: 'oranges', checked: false },
-    { id: cuid(), name: 'milk', checked: true },
-    { id: cuid(), name: 'bread', checked: false }
+    { id: cuid(), name: 'apples', edited: false, checked: false },
+    { id: cuid(), name: 'oranges', edited: false, checked: false },
+    { id: cuid(), name: 'milk', edited: false, checked: true },
+    { id: cuid(), name: 'bread', edited: false, checked: false }
   ],
   hideCheckedItems: false
 };
@@ -19,7 +19,7 @@ const generateItemElement = function (item) {
 
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
-      ${itemTitle}
+      ${itemTitle} <input type="text" class="hidden" name="edit" id='user_input'>
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
@@ -33,6 +33,8 @@ const generateItemElement = function (item) {
       </div>
     </li>`;
 };
+
+//when user clicks edit button, event handler changes the edited property from false to true, THEN run render, render calls generateItemElement in genItEl if (item.edited) provide different value for item title, then when handling submit event 
 
 const generateShoppingItemsString = function (shoppingList) {
   const items = shoppingList.map((item) => generateItemElement(item));
@@ -54,6 +56,7 @@ const render = function () {
   if (store.hideCheckedItems) {
     items = items.filter(item => !item.checked);
   }
+  
 
   /**
    * At this point, all filtering work has been 
@@ -103,6 +106,33 @@ const getItemIdFromElement = function (item) {
  * Responsible for deleting a list item.
  * @param {string} id 
  */
+const handleItemEditedClicked = function () {
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    const id = getItemIdFromElement(event.currentTarget);
+    toggleEditedProperty(id);
+    $('#user_input').toggleClass();
+  })
+}
+
+const listenForSubmit = function () {
+  $('.js-shopping-list').submit(event => {
+    store.items.name = updatedName();
+  })
+}
+
+const toggleEditedProperty = function (id) {
+  const foundItem = store.items.find(item => item.id === id);
+  foundItem.edited = !foundItem.edited;
+};
+
+const editItemTitle = function (id) {
+  const index = store.items.find(item => item.id === id);
+  store.items.splice(index, 1, updatedTitle);
+}
+
+const updatedName = function() {};
+
+
 const deleteListItem = function (id) {
   // As with 'addItemToShoppingLIst', this 
   // function also has the side effect of
